@@ -18,6 +18,7 @@ from transformers import Trainer, BitsAndBytesConfig, deepspeed
 from transformers.trainer_pt_utils import LabelSmoother
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate.utils import DistributedType
+from utils_comm.log_util import ic, logger
 
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
@@ -276,12 +277,13 @@ def train():
 
     device_map = None
     world_size = int(os.environ.get("WORLD_SIZE", 1))
+    ic(world_size, os.environ.get("LOCAL_RANK"))
     ddp = world_size != 1
     if lora_args.q_lora:
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else "auto"
         if len(training_args.fsdp) > 0 or deepspeed.is_deepspeed_zero3_enabled():
             logging.warning("FSDP or ZeRO3 is incompatible with QLoRA.")
-
+    return
     model_load_kwargs = {
         "low_cpu_mem_usage": not deepspeed.is_deepspeed_zero3_enabled(),
     }

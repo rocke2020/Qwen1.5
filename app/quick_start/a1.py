@@ -1,6 +1,17 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import transformers
+import pyarrow
+import os
+import sys
+import torch
 
+sys.path.append(os.path.abspath("."))
+from utils_comm.train_util import get_device
+
+get_device(1)
+# sys.exit()
+
+# print(pyarrow.__version__)
 device = "cuda:0"  # the device to load the model onto
 
 root_dir = "/mnt/nas1/models/"
