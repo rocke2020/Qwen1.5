@@ -79,7 +79,7 @@ DISTRIBUTED_ARGS="
     --master_port $MASTER_PORT
 "
 
-torchrun $DISTRIBUTED_ARGS finetune.py \
+OMP_NUM_THREADS=1 torchrun $DISTRIBUTED_ARGS examples/sft/finetune.py \
     --model_name_or_path $MODEL \
     --data_path $DATA \
     --bf16 True \
