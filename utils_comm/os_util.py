@@ -51,7 +51,7 @@ def check_process_status(pid):
 
 if __name__ == "__main__":
     ids = [
-        679116,
+        2064944,
         # 672068,
     ]
     kill_multi_prcoesss(ids)

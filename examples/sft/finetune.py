@@ -22,7 +22,7 @@ from loguru import logger
 from icecream import ic
 ic.configureOutput(includeContext=True, argToStringFunction=str)
 ic.lineWrapWidth = 120
-
+import sys
 
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
@@ -149,6 +149,8 @@ def preprocess(
     texts = []
     for i, msg in enumerate(messages):
         texts.append(
+            # auto add prefix <|im_start|> to each role, that's <|im_start|>user
+            # prevent prompt attack to cheat the model.
             tokenizer.apply_chat_template(
                 msg,
                 tokenize=True,
@@ -158,6 +160,8 @@ def preprocess(
                 truncation=True,
             )
         )
+        # logger.info(f'\n{texts[0]}')
+        # sys.exit()
     input_ids = torch.tensor(texts, dtype=torch.int)
     target_ids = input_ids.clone()
     target_ids[target_ids == tokenizer.pad_token_id] = IGNORE_TOKEN_ID
@@ -278,7 +282,7 @@ def train():
         training_args.distributed_state.distributed_type = DistributedType.DEEPSPEED
 
     local_rank = training_args.local_rank
-
+    rank0_print(f'is_deepspeed_zero3_enabled {deepspeed.is_deepspeed_zero3_enabled()}')
     device_map = None
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     ic(world_size, os.environ.get("LOCAL_RANK"))

@@ -68,6 +68,25 @@ class FileUtil:
             json.dump(data, f, ensure_ascii=ensure_ascii, indent=4, cls=JSONEncoder)
 
     @classmethod
+    def write_jsonl(cls, data_list, file_path, ensure_ascii=False):
+        with open(file_path, "w", encoding="utf-8") as f:
+            for text_obj in data_list:
+                f.write(
+                    json.dumps(text_obj, ensure_ascii=ensure_ascii, cls=JSONEncoder)
+                    + "\n"
+                )
+
+    @classmethod
+    def read_jsonl(cls, file_path):
+        results = []
+        with open(file_path, "r", encoding="utf-8") as f:
+            for item in f:
+                item = item.strip()
+                text_obj = json.loads(item)
+                results.append(text_obj)
+        return results
+
+    @classmethod
     def read_yml(cls, file_path):
         """ """
         with open(file_path, "r", encoding="utf-8") as file:
@@ -209,6 +228,8 @@ class JSONEncoder(json.JSONEncoder):
             return float(o)
         if isinstance(o, numpy.integer): # type: ignore
             return int(o)
+        # if isinstance(o, torch.Tensor):
+        #     return o.tolist()
         return super().default(o)
 
 
